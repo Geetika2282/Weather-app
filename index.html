@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather app</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" type="image/x-icon" href="images/icon.png" />
+</head>
+
+<body>
+    <div class="card">
+        <div class="search">
+            <input type="text" placeholder="Enter city name" spellcheck="false">
+            <button><img src="images/search.png" alt=""></button>
+        </div>
+        <div class="error">
+            <p>Invalid entry</p>
+        </div>
+        <div class="weather">
+            <img src="images/rain.png" alt="" class="weather-icon">
+            <h1 class="temp">12°C</h1>
+            <h2 class="city">Pune</h2>
+            <div class="details">
+                <div class="col">
+                    <img src="images/humidity.png" alt="humidity">
+                    <div>
+                        <p class="humidity">50%</p>
+                        <p>Humidity </p>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="images/wind.png" alt="wind">
+                    <div>
+                        <p class="wind">15 km/h</p>
+                        <p>Wind speed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // for api key:-
+        // 1. Go to open weather map website -> sign in
+        // 2. From the navigation bar choose "API keys" -> copy the key
+        // 3. From the top most navbar choose API -> Current Weather Data -> API doc
+        // 4. Copy API call link "https://api.openweathermap.org/data/2.5/weather?id={city id}&appid={API key}"
+
+        const apikey = "75ab1b995827d37b7b62d583349e0953";
+        const apiurl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+
+        const searchBox = document.querySelector(".search input");
+        const searchBtn = document.querySelector(".search button");
+        const weatherIcon = document.querySelector(".weather-icon")
+
+        async function checkWeather(city) {
+            // Hide the error message initially when a new search is initiated
+            document.querySelector(".error").style.display = "none";
+            document.querySelector(".weather").style.display = "none";
+
+            const response = await fetch(apiurl + city + `&appid=${apikey}`);
+
+            if (response.status == 404) {
+                document.querySelector(".error").style.display = "block";
+            }
+            else {
+                var data = await response.json();
+
+                // console.log(data);
+
+                document.querySelector(".city").innerHTML = data.name;
+                document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
+                document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+                document.querySelector(".wind").innerHTML = data.wind.speed + "km/h";
+
+                if (data.weather[0].main == "Clouds") {
+                    weatherIcon.src = "images/clouds.png";
+                }
+                else if (data.weather[0].main == "Clear") {
+                    weatherIcon.src = "images/clear.png";
+                }
+                else if (data.weather[0].main == "Rain") {
+                    weatherIcon.src = "images/rain.png";
+                }
+                else if (data.weather[0].main == "Drizzle") {
+                    weatherIcon.src = "images/drizzle.png";
+                }
+                else if (data.weather[0].main == "Mist") {
+                    weatherIcon.src = "images/mist.png";
+                }
+                document.querySelector(".weather").style.display = "block";
+            }
+        }
+        // Add an event listener for the "keydown" event on the input field
+        searchBox.addEventListener("keydown", (event) => {
+            // Check if the pressed key is "Enter" (key code 13)
+            if (event.keyCode === 13) {
+                checkWeather(searchBox.value);
+            }
+        });
+
+        // Add an event listener for the click event on the search button
+        searchBtn.addEventListener("click", () => {
+            checkWeather(searchBox.value);
+        });
+
+
+        //this will pass the city name entered in search bar and that will be passed in chechkWeather function
+        searchBtn.addEventListener("click", () => {
+            checkWeather(searchBox.value);
+        });
+
+    </script>
+
+</body>
+
+</html>
